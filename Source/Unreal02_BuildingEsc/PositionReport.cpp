@@ -2,6 +2,9 @@
 
 #include "PositionReport.h"
 
+// So we can access the Actor class and use GetOwner().
+#include "GameFramework/Actor.h"
+
 
 // Sets default values for this component's properties
 UPositionReport::UPositionReport()
@@ -19,8 +22,12 @@ void UPositionReport::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Purple things are macros? LogTemp is a log category, Warning is Yellow colour.
-	UE_LOG(LogTemp, Warning, TEXT("Ayo boi its PositionReport, how you doin?"));
+	// GetOwner returns a pointer to an object of type AActor, GetName returns a string containing the name of that AActor.
+	FString ObjectName = GetOwner()->GetName();
+
+	// Purple things are macros? LogTemp is a log category. Warning is Yellow colour.
+	// The star here is NOT a pointer, though it is SIMILAR to de-referencing. It's an overloaded operator.
+	UE_LOG( LogTemp, Warning, TEXT( "Ayo boi its %s, how you doin? I repeat, this is %s." ), *ObjectName, *GetOwner()->GetName() );
 
 	// ...
 }
