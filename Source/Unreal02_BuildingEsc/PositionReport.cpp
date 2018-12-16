@@ -19,8 +19,10 @@ void UPositionReport::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Purple things are macros? LogTemp is a log category, Warning is Yellow colour.
+	UE_LOG(LogTemp, Warning, TEXT("Ayo boi its PositionReport, how you doin?"));
+
 	// ...
-	
 }
 
 
