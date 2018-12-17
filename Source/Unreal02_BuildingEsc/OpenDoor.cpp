@@ -25,6 +25,7 @@ void UOpenDoor::BeginPlay()
 	
 }
 
+//// TODO FOR OPENING A DOOR, WE SHOULD USE DeltaSeconds INSTEAD OF TICKRATE ////
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
