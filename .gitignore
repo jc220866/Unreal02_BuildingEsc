@@ -1,1 +1,7 @@
 /Content/StarterContent
+/Binaries/
+/Intermediate/
+/Saved/
+/.vs/
+
+*.sln
