@@ -21,6 +21,14 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	float CurrentRoll = GetOwner()->GetActorRotation().Roll;
+	float CurrentPitch = GetOwner()->GetActorRotation().Pitch;
+	float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
+
+	FRotator NewRotation = FRotator(CurrentPitch, OpenAngle, CurrentRoll);
+
+	GetOwner()->SetActorRotation(NewRotation);
+
 	// ...
 	
 }
@@ -32,6 +40,8 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	/*		this code successfully makes the door twirl around continuously.
+
 	// FRotator stores a tuple of three floats representing the X, Y and Z rotation. GetActorRotation gets the RootComponent rotation.
 	FRotator CurrentRotation = GetOwner()->GetActorRotation();
 
@@ -41,13 +51,16 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
 
 	float YawIncrement = 1.0f;
-
 	float NewYaw = (CurrentYaw + YawIncrement);
 
-	// FRotator constructor wants Y, Z and X axis. What a frustratingly arbitrary order.
+	// FRotator constructor wants Y(Pitch), Z(Yaw) and X(Roll) axis. What a frustratingly arbitrary order.
 	FRotator NewRotation = FRotator(CurrentPitch, NewYaw, CurrentRoll);
 
 	GetOwner()->SetActorRotation(NewRotation);
+
+	*/
+
+	// ...
 
 	/*			medium fail. When making a new FRotator, you gotta put FRotator infront of the brackets...
 
@@ -56,10 +69,6 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	GetOwner()->SetActorRotation((0.0f, 0.0f, NewYaw));
 
 	*/
-
-	// ...
-
-
 
 	/*				big fail. We don't want to fiddle with quaternions
 

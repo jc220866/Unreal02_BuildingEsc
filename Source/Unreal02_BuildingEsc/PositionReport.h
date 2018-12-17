@@ -16,6 +16,7 @@ public:
 	// Sets default values for this component's properties
 	UPositionReport();
 
+// Protected is Private but it is accessible to every class that inherits from this class!
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
