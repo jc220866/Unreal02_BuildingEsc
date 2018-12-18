@@ -23,6 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OpenDoor();
+	void CloseDoor();
 
 public:	
 	// Called every frame
@@ -39,5 +40,18 @@ private:
 		ATriggerVolume* PressurePlate;
 	
 	// This variable is a pointer to any object of type 'AActor', which could be a player character/pawn or a chair.
-		AActor* ActorThatOpens; // Pawn inherits from actor
+	AActor* ActorThatOpens; // Pawn inherits from actor
+
+	UPROPERTY(EditAnywhere)
+		float DoorCloseDelay = 1.0f;
+
+	float LastDoorOpenTime;
+
+	AActor* Owner;
+
+	float StartingRoll;
+	float StartingPitch;
+	float StartingYaw;
+
+	float CurrentYaw; // = GetOwner()->GetActorRotation().Yaw;
 };

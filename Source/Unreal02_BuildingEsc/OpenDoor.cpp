@@ -5,6 +5,7 @@
 // So we can access the Actor class and use GetOwner().
 #include "GameFramework/Actor.h"
 
+// So we can access the GetWorld() function.
 #include "Engine/World.h"
 
 // Sets default values for this component's properties
@@ -23,22 +24,30 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Owner = GetOwner();
+
+	StartingRoll = GetOwner()->GetActorRotation().Roll;
+	StartingPitch = GetOwner()->GetActorRotation().Pitch;
+	StartingYaw = Owner->GetActorRotation().Yaw;
+
 	// Although this variable is of type AActor*, we are fine to send a APawn* because Pawns inherit from Actors. Pawns ARE Actors.
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// ...
-	
 }
 
 void UOpenDoor::OpenDoor()
 {
-	float CurrentRoll = GetOwner()->GetActorRotation().Roll;
-	float CurrentPitch = GetOwner()->GetActorRotation().Pitch;
-	float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
+	FRotator OpenRotation = FRotator(StartingPitch, OpenAngle, StartingRoll);
 
-	FRotator NewRotation = FRotator(CurrentPitch, OpenAngle, CurrentRoll);
+	Owner->SetActorRotation(OpenRotation);
+}
 
-	GetOwner()->SetActorRotation(NewRotation);
+void UOpenDoor::CloseDoor()
+{
+	FRotator CloseRotation = FRotator(StartingPitch, StartingYaw, StartingRoll);
+
+	Owner->SetActorRotation(CloseRotation);
 }
 
 //// TODO FOR OPENING A DOOR, WE SHOULD USE DeltaSeconds INSTEAD OF TICKRATE ////
@@ -53,7 +62,18 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if (PressurePlate->IsOverlappingActor(ActorThatOpens))
 	{
 		OpenDoor();
+		
+		// Store the time at which the door last opened, in order to accurately add a delay.
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
+
+	// if enough time has passed for the door to close
+	if (GetWorld()->GetTimeSeconds() > (LastDoorOpenTime + DoorCloseDelay))
+	{
+		CloseDoor();
+	}
+
+
 
 	/*		this code successfully makes the door twirl around continuously.
 
@@ -61,15 +81,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	FRotator CurrentRotation = GetOwner()->GetActorRotation();
 
 	// Here we get the current X, Y and Z axis rotations respectively. 
-	float CurrentRoll = GetOwner()->GetActorRotation().Roll;
-	float CurrentPitch = GetOwner()->GetActorRotation().Pitch;
+	float StartingRoll = GetOwner()->GetActorRotation().Roll;
+	float StartingPitch = GetOwner()->GetActorRotation().Pitch;
 	float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
 
 	float YawIncrement = 1.0f;
 	float NewYaw = (CurrentYaw + YawIncrement);
 
 	// FRotator constructor wants Y(Pitch), Z(Yaw) and X(Roll) axis. What a frustratingly arbitrary order.
-	FRotator NewRotation = FRotator(CurrentPitch, NewYaw, CurrentRoll);
+	FRotator NewRotation = FRotator(StartingPitch, NewYaw, StartingRoll);
 
 	GetOwner()->SetActorRotation(NewRotation);
 
