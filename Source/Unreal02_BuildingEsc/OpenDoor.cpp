@@ -21,6 +21,12 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// ...
+	
+}
+
+void UOpenDoor::OpenDoor()
+{
 	float CurrentRoll = GetOwner()->GetActorRotation().Roll;
 	float CurrentPitch = GetOwner()->GetActorRotation().Pitch;
 	float CurrentYaw = GetOwner()->GetActorRotation().Yaw;
@@ -28,9 +34,6 @@ void UOpenDoor::BeginPlay()
 	FRotator NewRotation = FRotator(CurrentPitch, OpenAngle, CurrentRoll);
 
 	GetOwner()->SetActorRotation(NewRotation);
-
-	// ...
-	
 }
 
 //// TODO FOR OPENING A DOOR, WE SHOULD USE DeltaSeconds INSTEAD OF TICKRATE ////
@@ -39,6 +42,13 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// poll the trigger volume every frame
+	// if the actor that opens is in the volume
+	if (PressurePlate->IsOverlappingActor(ActorThatOpens))
+	{
+		OpenDoor();
+	}
 
 	/*		this code successfully makes the door twirl around continuously.
 
