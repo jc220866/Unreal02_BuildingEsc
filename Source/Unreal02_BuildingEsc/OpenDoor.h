@@ -39,6 +39,5 @@ private:
 		ATriggerVolume* PressurePlate;
 	
 	// This variable is a pointer to any object of type 'AActor', which could be a player character/pawn or a chair.
-	UPROPERTY(EditAnywhere)
 		AActor* ActorThatOpens; // Pawn inherits from actor
 };

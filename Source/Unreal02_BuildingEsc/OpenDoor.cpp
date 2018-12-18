@@ -5,6 +5,8 @@
 // So we can access the Actor class and use GetOwner().
 #include "GameFramework/Actor.h"
 
+#include "Engine/World.h"
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
@@ -20,6 +22,9 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Although this variable is of type AActor*, we are fine to send a APawn* because Pawns inherit from Actors. Pawns ARE Actors.
+	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// ...
 	
