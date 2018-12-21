@@ -31,6 +31,7 @@ void UOpenDoor::BeginPlay()
 	StartingYaw = Owner->GetActorRotation().Yaw;
 
 	// Although this variable is of type AActor*, we are fine to send a APawn* because Pawns inherit from Actors. Pawns ARE Actors.
+	// This gets the default PlayerController in our world, then the pawn it is controlling.
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// ...
