@@ -28,5 +28,9 @@ private:
 
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
+
+	// This float defines how far, in centimeters, the distance which the player can grab objects from.
+	UPROPERTY(EditAnywhere)
+		float Reach = 200.f;
 	
 };

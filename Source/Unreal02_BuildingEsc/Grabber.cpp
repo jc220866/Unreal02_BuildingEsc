@@ -4,6 +4,9 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 
+// So we can draw debug lines.
+#include "DrawDebugHelpers.h"
+
 // To signify when an argument is 'output', when it is receiving a value from a function.
 #define OUT
 
@@ -43,11 +46,26 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		OUT PlayerViewPointRotation
 	);
 
-	// Remember to put a comma after the TEXT("")
-	UE_LOG(LogTemp, Warning, TEXT("%s, %s"), 
+	// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
+	UE_LOG(LogTemp, Log, TEXT("%s, %s"), 
 		*PlayerViewPointLocation.ToString(), 
 		*PlayerViewPointRotation.ToString()
 	);
+
+	// Calculating the end of our line trace every frame
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+
+	// Draw a red debug-line in the world to visualize our grabber
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewPointLocation,	// Start point. 
+		LineTraceEnd,				// End point
+		FColor(255, 0, 255),		// Colour. Takes R, G, B (and optional Alpha?)
+		true,						// Persistent lines. Will there be an afterimage?
+		0.2f,						// If there are persistent lines, how long do they last?
+		0,							// DepthPriority
+		0.5f						// The THICCness of the debug line
+	);						
 
 	// ray-cast / line-trace out to a maximum of 'reach-distance'
 
