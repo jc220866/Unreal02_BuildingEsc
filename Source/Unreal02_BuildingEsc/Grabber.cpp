@@ -28,6 +28,34 @@ void UGrabber::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
 
+	/// Look for the PhysicsHandle component attached to our DefaultPawn_BP blueprint.
+	/// This pointer is of type UPhysicsHandleComponent, it stores the PhysicsHandle component attached to our DefaultPawn_BP.
+	/// From Grabber, we go back up to owner via GetOwner(), then we come back down to find the attached PhysicsHandle component.
+	/// These angle brackets are something called a 'generic signature'.
+	/// FindComponentbyClass will work for multiple different classes. Here, the class is UPhysicsHandleComponent.
+	PhysicsHandlePointer = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+
+	if (PhysicsHandlePointer) // If our PhysicsHandlePointer is not 'nullptr'
+	{
+		// The PhysicsHandle component has been found. Do nothing.
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("PhysicsHandle component not found on %s."), *GetOwner()->GetName());
+	}
+
+	/// Look for attached InputComponent (only appears at run time!)
+	InputComponentPointer = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	if (InputComponentPointer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InputComponent found for %s."), *GetOwner()->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("InputComponent not found for %s. You may be unable to move."), *GetOwner()->GetName());
+	}
+
 	// ...
 	
 }
