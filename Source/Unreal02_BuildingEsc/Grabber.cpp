@@ -38,19 +38,20 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// get player viewpoint this tick. These variables were defined in the header file.
-	// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.
-	// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
+	/// get player viewpoint this tick. These variables were defined in the header file.
+	/// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.
+	/// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 		OUT PlayerViewPointLocation, 
 		OUT PlayerViewPointRotation
 	);
 
-	// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
+	/// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
+	/*
 	UE_LOG(LogTemp, Log, TEXT("%s, %s"), 
 		*PlayerViewPointLocation.ToString(), 
 		*PlayerViewPointRotation.ToString()
-	);
+	); */
 
 	// Calculating the end of our line trace every frame
 	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
@@ -67,7 +68,28 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		0.5f						// The THICCness of the debug line
 	);						
 
+	bool bLineTraceHit;
+	FHitResult LineTraceHitResult;
+
+	/// bInTraceComplex is asking whether the collision detection be 'simple' or 'complex' collision, player vs visibility.
+	/// *InIgnoreActor is asking which actor to ignore. We say our player since we don't want the grabber picking our own pawn up.
+	FCollisionQueryParams LineTraceParameters(FName(TEXT("")), false, GetOwner());
+
 	// ray-cast / line-trace out to a maximum of 'reach-distance'
+	/// LineTraceMulti passes through multiple objects and provides multiple answers in an array.
+	/// ByObjectType is referring to the 'type' of the object, such as 'PhysicsBody' in the case of our chairs and tables.
+	bLineTraceHit = GetWorld()->LineTraceSingleByObjectType(
+		OUT LineTraceHitResult,					// Updates our blank FHitResult with information of what we've hit with our trace.
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), // Specific object types we're looking for
+		LineTraceParameters												// Additional parameters defined above
+	);
+
+	if (bLineTraceHit) /// Logging out the name of the actor our LineTrace hits
+	{
+		UE_LOG(LogTemp, Log, TEXT("This is a %s"), *LineTraceHitResult.GetActor()->GetName())
+	}
 
 	// ...
 }
