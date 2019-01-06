@@ -56,6 +56,7 @@ void UGrabber::BeginPlay()
 		/// notice how the reference to (the address of) UGrabber::Grab() has omitted the parentheses.
 		/// To summarize: Action Name, when button is Pressed, reference Grabber, look for the Grab function.
 		InputComponentPointer->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponentPointer->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
 	else
 	{
@@ -71,6 +72,11 @@ void UGrabber::Grab()
 	// do something
 
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
 }
 
 // Called every frame

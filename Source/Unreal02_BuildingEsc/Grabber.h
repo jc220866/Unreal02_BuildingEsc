@@ -51,5 +51,6 @@ private:
 
 	// Ray-case / Line-trace and grab what's within reach.
 	void Grab();
+	void Release();
 	
 };
