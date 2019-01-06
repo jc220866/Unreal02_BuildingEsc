@@ -48,5 +48,8 @@ private:
 	*/
 	UPhysicsHandleComponent* PhysicsHandlePointer = nullptr;
 	UInputComponent* InputComponentPointer = nullptr;
+
+	// Ray-case / Line-trace and grab what's within reach.
+	void Grab();
 	
 };

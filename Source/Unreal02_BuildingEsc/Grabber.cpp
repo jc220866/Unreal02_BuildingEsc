@@ -20,7 +20,6 @@ UGrabber::UGrabber()
 	// ...
 }
 
-
 // Called when the game starts
 void UGrabber::BeginPlay()
 {
@@ -46,10 +45,17 @@ void UGrabber::BeginPlay()
 
 	/// Look for attached InputComponent (only appears at run time!)
 	InputComponentPointer = GetOwner()->FindComponentByClass<UInputComponent>();
-
 	if (InputComponentPointer)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InputComponent found for %s."), *GetOwner()->GetName());
+
+		// Bind the Grabber input action. 
+		/// FName ActionName ("Grab") must be spelled exactly the same as in the Unreal input panel.
+		/// IE_Pressed is when button is pressed. There is also IE_Released.
+		/// "this" is the 'object' this is operating on, it is a reference to Grabber itself.
+		/// notice how the reference to (the address of) UGrabber::Grab() has omitted the parentheses.
+		/// To summarize: Action Name, when button is Pressed, reference Grabber, look for the Grab function.
+		InputComponentPointer->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 	}
 	else
 	{
@@ -60,6 +66,12 @@ void UGrabber::BeginPlay()
 	
 }
 
+void UGrabber::Grab()
+{
+	// do something
+
+	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
+}
 
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -121,4 +133,3 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	// ...
 }
-
