@@ -76,21 +76,34 @@ void UGrabber::Grab()
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
 
 	// Try and reach any actors with PhysicsBody collision channel set
+	/// Ben wanted to put this as type 'auto'.
 	FHitResult LineTraceHitResult = LineTraceToFirstPhysicsBodyInReach();
+
+	/// This auto is good, because we need something with a type I don't yet fully understand.
+	class UPrimitiveComponent* ComponentToGrab = LineTraceHitResult.GetComponent();
 
 	// If we hit a valid actor
 	// If we don't hit a PhysicsBody actor, then the hit result is blank, so this statement is False.
 	if (LineTraceHitResult.GetActor())
 	{
-		UE_LOG(LogTemp, Log, TEXT("This be a %s"), *LineTraceHitResult.GetActor()->GetName())
+		UE_LOG(LogTemp, Log, TEXT("This be a %s"), *LineTraceHitResult.GetActor()->GetName());
 
-		// TODO Attach a Physics Handle
+		// Attach a Physics Handle
+		/// We are looking for a pointer to a UPrimitiveComponent, then the Bone name, then a location and rotation.
+		PhysicsHandlePointer->GrabComponentAtLocationWithRotation(
+			ComponentToGrab,
+			NAME_None, 
+			ComponentToGrab->GetOwner()->GetActorLocation(), 
+			ComponentToGrab->GetOwner()->GetActorRotation()
+		);
 	}
 }
 
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
+
+	PhysicsHandlePointer->ReleaseComponent();
 }
 
 FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach() const
@@ -152,8 +165,23 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// If physics handle is attached
-		// Move the object we're holding
+	// If physics handle is attached - if we DO HAVE a grabbed component
+	if (PhysicsHandlePointer->GrabbedComponent)
+	{	
+		// TODO refactor this duplicated code
+		FVector PlayerViewPointLocation;
+		FRotator PlayerViewPointRotation;
+		FHitResult LineTraceHitResult;
 
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+			OUT PlayerViewPointLocation,
+			OUT PlayerViewPointRotation
+		);
+
+		FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+
+		// Move the object we're holding
+		PhysicsHandlePointer->SetTargetLocation(LineTraceEnd);
+	}
 	// ...
 }
