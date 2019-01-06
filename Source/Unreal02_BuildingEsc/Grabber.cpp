@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+// See https://gist.github.com/SuperWig/980238ddc863f44044a98001daef54cf for a good refactor of this code using FTwoVectors
+
 #include "Grabber.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -36,11 +38,7 @@ void UGrabber::LookForAttachedPhysicsHandleComponent()
 	/// FindComponentByClass will work for multiple different classes. Here, the class is UPhysicsHandleComponent.
 	PhysicsHandlePointer = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
-	if (PhysicsHandlePointer) // If our PhysicsHandlePointer is not 'nullptr'
-	{
-		// The PhysicsHandle component has been found. Do nothing.
-	}
-	else
+	if (PhysicsHandlePointer == nullptr) // We COULD use an 'assert' but that is not yet introduced to me
 	{
 		UE_LOG(LogTemp, Error, TEXT("PhysicsHandle component not found on %s."), *GetOwner()->GetName());
 	}
@@ -69,6 +67,14 @@ void UGrabber::SetupInputComponent()
 	{
 		UE_LOG(LogTemp, Error, TEXT("InputComponent not found for %s. You may be unable to move."), *GetOwner()->GetName());
 	}
+}
+
+FVector UGrabber::GetLineTraceEnd(FVector PViewPLoc, FRotator PViewPRot)
+{
+	// Calculating the end of our line trace
+	FVector LineTraceEnd = PViewPLoc + PViewPRot.Vector() * Reach;
+
+	return LineTraceEnd;
 }
 
 void UGrabber::Grab()
@@ -106,12 +112,8 @@ void UGrabber::Release()
 	PhysicsHandlePointer->ReleaseComponent();
 }
 
-FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach() const
+FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach()
 {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-	FHitResult LineTraceHitResult;
-
 	/// get player viewpoint this tick. These variables were defined in the header file.
 	/// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.
 	/// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
@@ -120,19 +122,19 @@ FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach() const
 		OUT PlayerViewPointRotation
 	);
 
-	/// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
+	/// Remember to put a comma after the TEXT(""). For block-commenting; highlight text, hold Ctrl, then hold K, then press C.
 	/*
 	UE_LOG(LogTemp, Log, TEXT("%s, %s"),
 		*PlayerViewPointLocation.ToString(),
 		*PlayerViewPointRotation.ToString()
 	); */
 
-	// Calculating the end of our line trace every frame
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
-
 	/// bInTraceComplex is asking whether the collision detection be 'simple' or 'complex' collision, player vs visibility.
 	/// *InIgnoreActor is asking which actor to ignore. We say our player since we don't want the grabber picking our own pawn up.
 	FCollisionQueryParams LineTraceParameters(FName(TEXT("")), false, GetOwner());
+
+	FVector LineTraceEnd = GetLineTraceEnd(PlayerViewPointLocation, PlayerViewPointRotation);
+	FHitResult LineTraceHitResult;
 
 	// ray-cast / line-trace out to a maximum of 'reach-distance'
 	/// LineTraceMulti passes through multiple objects and provides multiple answers in an array.
@@ -165,23 +167,65 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!PhysicsHandlePointer) { return; } // If the PhysicsHandle doesn't exist, GTFO
 	// If physics handle is attached - if we DO HAVE a grabbed component
 	if (PhysicsHandlePointer->GrabbedComponent)
 	{	
-		// TODO refactor this duplicated code
-		FVector PlayerViewPointLocation;
-		FRotator PlayerViewPointRotation;
-		FHitResult LineTraceHitResult;
-
+		/// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
 		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 			OUT PlayerViewPointLocation,
 			OUT PlayerViewPointRotation
 		);
 
-		FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+		FVector LineTraceEnd = GetLineTraceEnd(PlayerViewPointLocation, PlayerViewPointRotation);
 
 		// Move the object we're holding
 		PhysicsHandlePointer->SetTargetLocation(LineTraceEnd);
 	}
-	// ...
 }
+
+// Dan's superior refactor using FTwoVectors
+/*
+void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!PhysicsHandle) { return; }
+	// if the physics handle is attached
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		// move the object that we're holding
+		PhysicsHandle->SetTargetLocation(GetLineTracePoints().v2);
+	}
+}
+
+FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
+{
+	/// Line-trace (AKA ray-cast) out to reach distance
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
+	FTwoVectors TracePoints = GetLineTracePoints();
+	//with C++17
+	//auto [Start, End] = GetLineTracePoints();
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT HitResult,
+		TracePoints.v1, //Start
+		TracePoints.v2, //End
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		TraceParameters
+	);
+	return HitResult;
+}
+
+FTwoVectors UGrabber::GetLineTracePoints() const
+{
+	FVector StartLocation;
+	FRotator PlayerViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT StartLocation,
+		OUT PlayerViewPointRotation
+	);
+	FVector EndLocation = StartLocation + PlayerViewPointRotation.Vector() * Reach;
+	return FTwoVectors(StartLocation, EndLocation);
+}
+*/

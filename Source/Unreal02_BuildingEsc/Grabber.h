@@ -51,6 +51,11 @@ private:
 	UPhysicsHandleComponent* PhysicsHandlePointer = nullptr;
 	UInputComponent* InputComponentPointer = nullptr;
 
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	FVector GetLineTraceEnd(FVector PViewPLoc, FRotator PViewPRot);
+
 	// Find (assumed) attached physics handle component
 	void LookForAttachedPhysicsHandleComponent();
 
@@ -62,5 +67,5 @@ private:
 	void Release();
 
 	// Return hit for first physics body within reach
-	FHitResult LineTraceToFirstPhysicsBodyInReach() const;
+	FHitResult LineTraceToFirstPhysicsBodyInReach();
 };
