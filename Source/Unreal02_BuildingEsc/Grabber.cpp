@@ -76,9 +76,16 @@ void UGrabber::Grab()
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
 
 	// Try and reach any actors with PhysicsBody collision channel set
+	FHitResult LineTraceHitResult = LineTraceToFirstPhysicsBodyInReach();
 
-	// If we hit something
+	// If we hit a valid actor
+	// If we don't hit a PhysicsBody actor, then the hit result is blank, so this statement is False.
+	if (LineTraceHitResult.GetActor())
+	{
+		UE_LOG(LogTemp, Log, TEXT("This be a %s"), *LineTraceHitResult.GetActor()->GetName())
+
 		// TODO Attach a Physics Handle
+	}
 }
 
 void UGrabber::Release()
@@ -86,9 +93,58 @@ void UGrabber::Release()
 	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
 }
 
-FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
+FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach() const
 {
-	return FHitResult();
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+	FHitResult LineTraceHitResult;
+
+	/// get player viewpoint this tick. These variables were defined in the header file.
+	/// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.
+	/// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+
+	/// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
+	/*
+	UE_LOG(LogTemp, Log, TEXT("%s, %s"),
+		*PlayerViewPointLocation.ToString(),
+		*PlayerViewPointRotation.ToString()
+	); */
+
+	// Calculating the end of our line trace every frame
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+
+	/// bInTraceComplex is asking whether the collision detection be 'simple' or 'complex' collision, player vs visibility.
+	/// *InIgnoreActor is asking which actor to ignore. We say our player since we don't want the grabber picking our own pawn up.
+	FCollisionQueryParams LineTraceParameters(FName(TEXT("")), false, GetOwner());
+
+	// ray-cast / line-trace out to a maximum of 'reach-distance'
+	/// LineTraceMulti passes through multiple objects and provides multiple answers in an array.
+	/// ByObjectType is referring to the 'type' of the object, such as 'PhysicsBody' in the case of our chairs and tables.
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT LineTraceHitResult,					// Updates our blank FHitResult with information of what we've hit with our trace.
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), // Specific object types we're looking for
+		LineTraceParameters												// Additional parameters defined above
+	);
+
+	// Draw a red debug-line in the world to visualize our grabber
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewPointLocation,	// Start point. 
+		LineTraceEnd,				// End point
+		FColor(255, 0, 255),		// Colour. Takes R, G, B (and optional Alpha?)
+		true,						// Persistent lines. Will there be an afterimage?
+		2.0f,						// If there are persistent lines, how long do they last?
+		0,							// DepthPriority
+		0.5f						// The THICCness of the debug line
+	);
+
+	return LineTraceHitResult;
 }
 
 // Called every frame
@@ -98,59 +154,6 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	// If physics handle is attached
 		// Move the object we're holding
-
-	/// get player viewpoint this tick. These variables were defined in the header file.
-	/// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.
-	/// To signify that this naughty getter is changing variables, we defined a blank keyword 'OUT' for our benefit.
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation, 
-		OUT PlayerViewPointRotation
-	);
-
-	/// Remember to put a comma after the TEXT(""). Highlight text, hold Ctrl, then hold K, then press C.
-	/*
-	UE_LOG(LogTemp, Log, TEXT("%s, %s"), 
-		*PlayerViewPointLocation.ToString(), 
-		*PlayerViewPointRotation.ToString()
-	); */
-
-	// Calculating the end of our line trace every frame
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
-
-	// Draw a red debug-line in the world to visualize our grabber
-	DrawDebugLine(
-		GetWorld(),
-		PlayerViewPointLocation,	// Start point. 
-		LineTraceEnd,				// End point
-		FColor(255, 0, 255),		// Colour. Takes R, G, B (and optional Alpha?)
-		true,						// Persistent lines. Will there be an afterimage?
-		0.2f,						// If there are persistent lines, how long do they last?
-		0,							// DepthPriority
-		0.5f						// The THICCness of the debug line
-	);						
-
-	bool bLineTraceHit;
-	FHitResult LineTraceHitResult;
-
-	/// bInTraceComplex is asking whether the collision detection be 'simple' or 'complex' collision, player vs visibility.
-	/// *InIgnoreActor is asking which actor to ignore. We say our player since we don't want the grabber picking our own pawn up.
-	FCollisionQueryParams LineTraceParameters(FName(TEXT("")), false, GetOwner());
-
-	// ray-cast / line-trace out to a maximum of 'reach-distance'
-	/// LineTraceMulti passes through multiple objects and provides multiple answers in an array.
-	/// ByObjectType is referring to the 'type' of the object, such as 'PhysicsBody' in the case of our chairs and tables.
-	bLineTraceHit = GetWorld()->LineTraceSingleByObjectType(
-		OUT LineTraceHitResult,					// Updates our blank FHitResult with information of what we've hit with our trace.
-		PlayerViewPointLocation,
-		LineTraceEnd,
-		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), // Specific object types we're looking for
-		LineTraceParameters												// Additional parameters defined above
-	);
-
-	if (bLineTraceHit) /// Logging out the name of the actor our LineTrace hits
-	{
-		UE_LOG(LogTemp, Log, TEXT("This is a %s"), *LineTraceHitResult.GetActor()->GetName())
-	}
 
 	// ...
 }
