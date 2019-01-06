@@ -8,6 +8,9 @@
 // So we can create a pointer of type UPhysicsHandleComponent
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
+// So we can work with the Primitive Component class without errors.
+#include "Components/PrimitiveComponent.h"
+
 // So we can create a pointer of type UInputComponent
 #include "Components/InputComponent.h"
 
