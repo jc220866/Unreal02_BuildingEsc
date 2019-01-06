@@ -8,6 +8,9 @@
 // So we can access the GetWorld() function.
 #include "Engine/World.h"
 
+// To signify when an argument is 'output', when it is receiving a value from a function.
+#define OUT
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
@@ -32,7 +35,7 @@ void UOpenDoor::BeginPlay()
 
 	// Although this variable is of type AActor*, we are fine to send a APawn* because Pawns inherit from Actors. Pawns ARE Actors.
 	// This gets the default PlayerController in our world, then the pawn it is controlling.
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+	// ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 	// ...
 }
@@ -51,6 +54,26 @@ void UOpenDoor::CloseDoor()
 	Owner->SetActorRotation(CloseRotation);
 }
 
+float UOpenDoor::GetTotalMassOfActorsOnPressurePlate()
+{
+	// Give me a list of AActor*s (pointers to actors).
+	TArray<AActor*> ActorsOnPressurePlate;
+	PressurePlate->GetOverlappingActors(OUT ActorsOnPressurePlate);
+
+	// Iterate through the Actors on the Pressure Plate and sum their masses.
+	float MassOfActorsOnPressurePlate = 0.0f;
+
+	/// const emphasizes that the Actor does not change in this process
+	for (const AActor *ActorPointer : ActorsOnPressurePlate)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Actor on pressure plate: %s"), *ActorPointer->GetName());
+
+		MassOfActorsOnPressurePlate += ActorPointer->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	return MassOfActorsOnPressurePlate;
+}
+
 //// TODO FOR OPENING A DOOR, WE SHOULD USE DeltaSeconds INSTEAD OF TICKRATE ////
 
 // Called every frame
@@ -59,8 +82,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// poll the trigger volume every frame
-	// if the actor that opens is in the volume
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens))
+	if (GetTotalMassOfActorsOnPressurePlate() >= TriggerMass)
 	{
 		OpenDoor();
 		

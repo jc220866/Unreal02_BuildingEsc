@@ -5,6 +5,10 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/TriggerVolume.h"
+
+// So we can work with the Primitive Component class without errors.
+#include "Components/PrimitiveComponent.h"
+
 #include "OpenDoor.generated.h"
 
 
@@ -39,10 +43,10 @@ private:
 		ATriggerVolume* PressurePlate;
 	
 	// This variable is a pointer to any object of type 'AActor', which could be a player character/pawn or a chair.
-	AActor* ActorThatOpens; // Pawn inherits from actor
+	// AActor* ActorThatOpens; // Pawn inherits from actor
 
-	UPROPERTY(EditAnywhere)
-		float DoorCloseDelay = 1.0f;
+	UPROPERTY(EditAnywhere) float DoorCloseDelay = 1.0f;
+	UPROPERTY(EditAnywhere) float TriggerMass = 30.0f;
 
 	float LastDoorOpenTime;
 
@@ -53,4 +57,6 @@ private:
 	float StartingYaw;
 
 	float CurrentYaw; // = GetOwner()->GetActorRotation().Yaw;
+
+	float GetTotalMassOfActorsOnPressurePlate();
 };
