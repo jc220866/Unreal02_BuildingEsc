@@ -17,6 +17,9 @@ public:
 	// Sets default values for this component's properties
 	UOpenDoor();
 
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 // Protected is Private but it is accessible to every class that inherits from this class!
 protected: 
 	// Called when the game starts
@@ -24,10 +27,6 @@ protected:
 
 	void OpenDoor();
 	void CloseDoor();
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 

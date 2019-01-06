@@ -16,8 +16,6 @@ UGrabber::UGrabber()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 // Called when the game starts
@@ -25,13 +23,17 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
+	LookForAttachedPhysicsHandleComponent();
+	SetupInputComponent();
+}
 
+void UGrabber::LookForAttachedPhysicsHandleComponent()
+{
 	/// Look for the PhysicsHandle component attached to our DefaultPawn_BP blueprint.
 	/// This pointer is of type UPhysicsHandleComponent, it stores the PhysicsHandle component attached to our DefaultPawn_BP.
 	/// From Grabber, we go back up to owner via GetOwner(), then we come back down to find the attached PhysicsHandle component.
 	/// These angle brackets are something called a 'generic signature'.
-	/// FindComponentbyClass will work for multiple different classes. Here, the class is UPhysicsHandleComponent.
+	/// FindComponentByClass will work for multiple different classes. Here, the class is UPhysicsHandleComponent.
 	PhysicsHandlePointer = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
 	if (PhysicsHandlePointer) // If our PhysicsHandlePointer is not 'nullptr'
@@ -42,19 +44,24 @@ void UGrabber::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("PhysicsHandle component not found on %s."), *GetOwner()->GetName());
 	}
+}
 
+void UGrabber::SetupInputComponent()
+{
 	/// Look for attached InputComponent (only appears at run time!)
 	InputComponentPointer = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	/// If found, we will bind all necessary actions (like Grab and Release) here.
 	if (InputComponentPointer)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InputComponent found for %s."), *GetOwner()->GetName());
 
 		// Bind the Grabber input action. 
-		/// FName ActionName ("Grab") must be spelled exactly the same as in the Unreal input panel.
+		/* FName ActionName ("Grab") must be spelled exactly the same as in the Unreal input panel.
 		/// IE_Pressed is when button is pressed. There is also IE_Released.
 		/// "this" is the 'object' this is operating on, it is a reference to Grabber itself.
 		/// notice how the reference to (the address of) UGrabber::Grab() has omitted the parentheses.
-		/// To summarize: Action Name, when button is Pressed, reference Grabber, look for the Grab function.
+		/// To summarize: Action Name, when button is Pressed, reference Grabber, look for the Grab function. */
 		InputComponentPointer->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		InputComponentPointer->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
@@ -62,16 +69,16 @@ void UGrabber::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("InputComponent not found for %s. You may be unable to move."), *GetOwner()->GetName());
 	}
-
-	// ...
-	
 }
 
 void UGrabber::Grab()
 {
-	// do something
-
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
+
+	// Try and reach any actors with PhysicsBody collision channel set
+
+	// If we hit something
+		// TODO Attach a Physics Handle
 }
 
 void UGrabber::Release()
@@ -79,10 +86,18 @@ void UGrabber::Release()
 	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
 }
 
+FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
+{
+	return FHitResult();
+}
+
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// If physics handle is attached
+		// Move the object we're holding
 
 	/// get player viewpoint this tick. These variables were defined in the header file.
 	/// GetPlayerViewPoint takes in two variables and changes them! Naughty getter.

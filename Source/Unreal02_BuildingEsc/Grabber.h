@@ -21,16 +21,18 @@ class UNREAL02_BUILDINGESC_API UGrabber : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+
 	// Sets default values for this component's properties
 	UGrabber();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+// Protected is Private but it is accessible to every class that inherits from this class!
+protected:
+
+	// Called when the game starts
+	virtual void BeginPlay() override;
 
 private:
 
@@ -49,8 +51,16 @@ private:
 	UPhysicsHandleComponent* PhysicsHandlePointer = nullptr;
 	UInputComponent* InputComponentPointer = nullptr;
 
+	// Find (assumed) attached physics handle component
+	void LookForAttachedPhysicsHandleComponent();
+
+	// Setup (assumed) attached input component
+	void SetupInputComponent();
+
 	// Ray-case / Line-trace and grab what's within reach.
 	void Grab();
 	void Release();
-	
+
+	// Return hit for first physics body within reach
+	FHitResult GetFirstPhysicsBodyInReach() const;
 };
