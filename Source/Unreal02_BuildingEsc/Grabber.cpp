@@ -81,6 +81,8 @@ void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
 
+	if (PhysicsHandlePointer == nullptr) { return; }
+
 	// Try and reach any actors with PhysicsBody collision channel set
 	/// Ben wanted to put this as type 'auto'.
 	FHitResult LineTraceHitResult = LineTraceToFirstPhysicsBodyInReach();
@@ -108,6 +110,8 @@ void UGrabber::Grab()
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
+
+	if (PhysicsHandlePointer == nullptr) { return; }
 
 	PhysicsHandlePointer->ReleaseComponent();
 }

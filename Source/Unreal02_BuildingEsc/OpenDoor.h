@@ -40,7 +40,7 @@ private:
 
 	// This variable is a pointer to any object of type 'ATriggerVolume', like the trigger volume boxes in Unreal.
 	UPROPERTY(EditAnywhere)
-		ATriggerVolume* PressurePlate;
+		ATriggerVolume* PressurePlate = nullptr;
 	
 	// This variable is a pointer to any object of type 'AActor', which could be a player character/pawn or a chair.
 	// AActor* ActorThatOpens; // Pawn inherits from actor
