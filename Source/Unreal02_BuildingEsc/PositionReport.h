@@ -13,18 +13,19 @@ class UNREAL02_BUILDINGESC_API UPositionReport : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+
 	// Sets default values for this component's properties
 	UPositionReport();
 
 // Protected is Private but it is accessible to every class that inherits from this class!
 protected:
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
-	
 };

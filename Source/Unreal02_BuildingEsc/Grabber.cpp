@@ -69,10 +69,10 @@ void UGrabber::SetupInputComponent()
 	}
 }
 
-FVector UGrabber::GetLineTraceEnd(FVector PViewPLoc, FRotator PViewPRot)
+FVector UGrabber::GetLineTraceEnd(FVector PlayerViewpointLocation, FRotator PlayerViewpointRotation)
 {
 	// Calculating the end of our line trace
-	FVector LineTraceEnd = PViewPLoc + PViewPRot.Vector() * Reach;
+	FVector LineTraceEnd = PlayerViewpointLocation + PlayerViewpointRotation.Vector() * Reach;
 
 	return LineTraceEnd;
 }

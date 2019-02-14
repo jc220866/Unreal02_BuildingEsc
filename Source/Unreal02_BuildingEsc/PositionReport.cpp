@@ -5,17 +5,13 @@
 // So we can access the Actor class and use GetOwner().
 #include "GameFramework/Actor.h"
 
-
 // Sets default values for this component's properties
 UPositionReport::UPositionReport()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame. 
 	// You can turn these features off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
-
 
 // Called when the game starts
 void UPositionReport::BeginPlay()
@@ -36,7 +32,6 @@ void UPositionReport::BeginPlay()
 	UE_LOG( LogTemp, Warning, TEXT( "Ayo boi its %s, how you doin? I repeat, this is %s." \
 		" I'm at %s. Again, that's %s." ), *ObjectName, *GetOwner()->GetName(), *ObjectPosition, *ObjectPositionCompact );
 
-	// ...
 
 	// GetACTORLocation returns the RootComponent's location.
 	FString ObjectPosRoot = GetOwner()->GetActorLocation().ToString();
@@ -45,12 +40,8 @@ void UPositionReport::BeginPlay()
 	FString ObjectPosRootAlt = GetOwner()->GetActorTransform().GetLocation().ToString();
 }
 
-
 // Called every frame
 void UPositionReport::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
-
