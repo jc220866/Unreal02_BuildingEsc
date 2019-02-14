@@ -11,16 +11,14 @@
 // To signify when an argument is 'output', when it is receiving a value from a function.
 #define OUT
 
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
-
 
 // Called when the game starts
 void UOpenDoor::BeginPlay()
@@ -36,8 +34,6 @@ void UOpenDoor::BeginPlay()
 	// Although this variable is of type AActor*, we are fine to send a APawn* because Pawns inherit from Actors. Pawns ARE Actors.
 	// This gets the default PlayerController in our world, then the pawn it is controlling.
 	// ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
-
-	// ...
 }
 
 void UOpenDoor::OpenDoor()
@@ -70,7 +66,6 @@ float UOpenDoor::GetTotalMassOfActorsOnPressurePlate()
 
 		MassOfActorsOnPressurePlate += ActorPointer->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
-
 	return MassOfActorsOnPressurePlate;
 }
 
@@ -95,8 +90,6 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		CloseDoor();
 	}
-
-
 
 	/*		this code successfully makes the door twirl around continuously.
 
@@ -147,4 +140,3 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	*/
 }
-

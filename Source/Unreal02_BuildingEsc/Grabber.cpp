@@ -12,6 +12,7 @@
 // To signify when an argument is 'output', when it is receiving a value from a function.
 #define OUT
 
+
 // Sets default values for this component's properties
 UGrabber::UGrabber()
 {
@@ -81,8 +82,6 @@ void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
 
-	if (PhysicsHandlePointer == nullptr) { return; }
-
 	// Try and reach any actors with PhysicsBody collision channel set
 	/// Ben wanted to put this as type 'auto'.
 	FHitResult LineTraceHitResult = LineTraceToFirstPhysicsBodyInReach();
@@ -111,8 +110,6 @@ void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab released!"));
 
-	if (PhysicsHandlePointer == nullptr) { return; }
-
 	PhysicsHandlePointer->ReleaseComponent();
 }
 
@@ -125,14 +122,13 @@ FHitResult UGrabber::LineTraceToFirstPhysicsBodyInReach()
 		OUT PlayerViewPointLocation,
 		OUT PlayerViewPointRotation
 	);
-
 	/// Remember to put a comma after the TEXT(""). For block-commenting; highlight text, hold Ctrl, then hold K, then press C.
 	/*
 	UE_LOG(LogTemp, Log, TEXT("%s, %s"),
 		*PlayerViewPointLocation.ToString(),
 		*PlayerViewPointRotation.ToString()
-	); */
-
+	); 
+	*/
 	/// bInTraceComplex is asking whether the collision detection be 'simple' or 'complex' collision, player vs visibility.
 	/// *InIgnoreActor is asking which actor to ignore. We say our player since we don't want the grabber picking our own pawn up.
 	FCollisionQueryParams LineTraceParameters(FName(TEXT("")), false, GetOwner());
@@ -172,6 +168,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (!PhysicsHandlePointer) { return; } // If the PhysicsHandle doesn't exist, GTFO
+
 	// If physics handle is attached - if we DO HAVE a grabbed component
 	if (PhysicsHandlePointer->GrabbedComponent)
 	{	

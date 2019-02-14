@@ -29,10 +29,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+private:
+
 	void OpenDoor();
 	void CloseDoor();
-
-private:
 
 	// Setting the UPROPERTY of this variable to EditAnywhere allows us to edit it in the component menu in the Details tab.
 	UPROPERTY(EditAnywhere)
